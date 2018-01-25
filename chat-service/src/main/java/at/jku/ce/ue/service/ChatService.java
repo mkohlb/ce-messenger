@@ -1,25 +1,29 @@
 package at.jku.ce.ue.service;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import at.jku.ce.ue.api.RegisterChatService;
 import at.jku.ce.ue.helper.CEHelper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 public class ChatService {
 
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 
-		Config config = ConfigFactory.load("application.conf");
-		ActorSystem chatServiceSystem = ActorSystem.create("chat-service");
-		CEHelper helper = new CEHelper(chatServiceSystem, config);
+		Config cfg = ConfigFactory.load("application.conf");
+		ActorSystem acthors = ActorSystem.create("WarEternal");
+		CEHelper ceTemp = new CEHelper(acthors, cfg);
 
-		// sample actor
-		ActorRef sampleActor = chatServiceSystem.actorOf(Props.create(SampleActor.class), "sample-actor");
+		ActorRef refTemp = acthors.actorOf(Props.create(SampleActor.class), "ArchEnemy");
+		System.out.println(ceTemp.getActorPath(refTemp));
 
-		// get fully qualified path of sample actor
-		System.out.println(helper.getActorPath(sampleActor));
+		ActorSelection roomClient = acthors.actorSelection(ceTemp.getChatServiceRegistry());
+		roomClient.tell(new RegisterChatService(), refTemp);
+
 
 	}
 
